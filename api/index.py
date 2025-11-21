@@ -5,7 +5,7 @@ import io
 import base64
 
 class handler(BaseHTTPRequestHandler):
-    def do_get(self):
+    def do_GET(self):
         query_comp = parse_qs(urlparse(self.path).query)
         url_to_encode = query_comp.get('url', [None])[0]
         if not url_to_encode:
@@ -15,7 +15,12 @@ class handler(BaseHTTPRequestHandler):
             self.wfile.write("No URL Given so Fuck off".encode())
             return
         
-        qr = qrcode.QRCode(version=1, error_correction=qrcode.constants.ERROR_CORRECT_H, box_size= 10, border=4)
+        qr = qrcode.QRCode(
+            version = 1,
+            error_correction=qrcode.constants.ERROR_CORRECT_H,
+            box_size = 10,
+            border = 4
+            )
         qr.add_data(url_to_encode)
         qr.make(fit=True)
         img = qr.make_image(fill_color="black", back_color="white") #create
