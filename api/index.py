@@ -18,7 +18,7 @@ class handler(BaseHTTPRequestHandler):
         qr = qrcode.QRCode(version=1, error_correction=qrcode.constants.ERROR_CORRECT_H, box_size= 10, border=4)
         qr.add_data(url_to_encode)
         qr.make(fit=True)
-        img = qr.make_image(f_c="black", b_c="white") #create
+        img = qr.make_image(fill_color="black", back_color="white") #create
         #save
         img_byte_a = io.BytesIO()
         img.save(img_byte_a, format = 'PNG')
