@@ -1,0 +1,29 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Permanent QR Code Generator</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+    <div class="container">
+        <h1>QR Code Generator</h1>
+        <p>Enter a URL below to generate your permanent QR code.</p>
+        
+        <div class="input-group">
+            <input type="url" id="urlInput" placeholder="https://example.com" required>
+            <button onclick="generateQR()">Generate</button>
+        </div>
+
+        <div id="qr-result" class="hidden">
+            <img id="qrImage" alt="Generated QR Code" />
+            <br>
+            <a id="downloadLink" href="#" download="qrcode.png">Download PNG</a>
+        </div>
+    </div>
+
+    <script src="script.js"></script>
+</body>
+</html>
