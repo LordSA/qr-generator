@@ -1,5 +1,5 @@
 function generateQR() {
-    const url = document.getElementId('urlInput').value;
+    const url = document.getElementById('urlInput').value;
     const qrresult = document.getElementById('qr-result');
     const qrImage = document.getElementById('qrImage');
     const dl = document.getElementById('downloadLink');
