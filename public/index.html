@@ -1,5 +1,6 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -8,8 +9,10 @@
     <link rel="icon" href="logo.png">
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700&display=swap"
+        rel="stylesheet">
 </head>
+
 <body>
     <div class="background-glow"></div>
 
@@ -21,21 +24,27 @@
             </div>
             <p>Generate high-quality, permanent QR codes instantly for any link or text.</p>
         </header>
-        
+
         <div class="quick-types">
-            <button type="button" class="chip active" data-placeholder="https://example.com" data-type="url">Link</button>
-            <button type="button" class="chip" data-placeholder="Type any message, note or secret..." data-type="text">Text</button>
-            <button type="button" class="chip" data-placeholder="WIFI:S:MyNetwork;T:WPA;P:MyPassword;;" data-type="wifi">Wi-Fi</button>
-            <button type="button" class="chip" data-placeholder="mailto:contact@example.com?subject=Hello" data-type="email">Email</button>
+            <button type="button" class="chip active" data-placeholder="https://example.com"
+                data-type="url">Link</button>
+            <button type="button" class="chip" data-placeholder="Type any message, note or secret..."
+                data-type="text">Text</button>
+            <button type="button" class="chip" data-placeholder="WIFI:S:MyNetwork;T:WPA;P:MyPassword;;"
+                data-type="wifi">Wi-Fi</button>
+            <button type="button" class="chip" data-placeholder="mailto:contact@example.com?subject=Hello"
+                data-type="email">Email</button>
         </div>
 
         <div class="input-card">
             <div class="input-wrapper">
-                <svg class="input-icon" viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2">
+                <svg class="input-icon" viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor"
+                    stroke-width="2">
                     <path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"></path>
                     <path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"></path>
                 </svg>
-                <input type="text" id="urlInput" placeholder="https://example.com" autocomplete="off" spellcheck="false">
+                <input type="text" id="urlInput" placeholder="https://example.com" autocomplete="off"
+                    spellcheck="false">
                 <button type="button" id="clearBtn" class="clear-btn" title="Clear input" aria-label="Clear">✕</button>
             </div>
 
@@ -91,12 +100,7 @@
                     Copy Image
                 </button>
             </div>
-            
-            <div class="api-info-bar">
-                <span class="status-indicator online"></span>
-                <span class="status-text">Client & Python API Ready</span>
-                <button type="button" id="testApiBtn" class="link-btn" title="Test generating via Python server">Test Backend API</button>
-            </div>
+
         </section>
 
         <div id="toast" class="toast hidden"></div>
@@ -105,4 +109,5 @@
     <script src="qrcode.min.js"></script>
     <script src="script.js"></script>
 </body>
+
 </html>
