@@ -39,7 +39,7 @@ body {
     position: relative;
 }
 
-/* Background Atmosphere */
+
 .ambient-glow {
     position: fixed;
     top: 20%;
@@ -52,7 +52,7 @@ body {
     pointer-events: none;
 }
 
-/* Studio Header Nav */
+
 .studio-nav {
     position: relative;
     z-index: 10;
@@ -140,7 +140,7 @@ body {
     color: var(--text-primary);
 }
 
-/* Studio Layout Container */
+
 .studio-container {
     position: relative;
     z-index: 1;
@@ -155,7 +155,7 @@ body {
     align-items: start;
 }
 
-/* Left Column: Studio Controls Panel */
+
 .studio-controls {
     background: var(--card-bg);
     border: 1px solid var(--card-border);
@@ -165,7 +165,7 @@ body {
     overflow: hidden;
 }
 
-/* Tabs Navigation */
+
 .tabs-bar {
     display: flex;
     background: rgba(0, 0, 0, 0.25);
@@ -202,7 +202,7 @@ body {
     box-shadow: 0 2px 8px rgba(0, 0, 0, 0.3);
 }
 
-/* Tab Panels */
+
 .tab-panels {
     padding: 24px;
 }
@@ -218,7 +218,7 @@ body {
     display: flex;
 }
 
-/* Form Fields */
+
 .field-group {
     display: flex;
     flex-direction: column;
@@ -238,7 +238,7 @@ body {
     color: var(--text-muted);
 }
 
-/* Preset Chips */
+
 .preset-chips {
     display: flex;
     gap: 8px;
@@ -269,7 +269,7 @@ body {
     box-shadow: 0 0 10px rgba(0, 210, 255, 0.2);
 }
 
-/* Input Container */
+
 .input-container {
     position: relative;
 }
@@ -312,7 +312,7 @@ textarea#urlInput:focus {
     color: var(--text-primary);
 }
 
-/* Design Selector Cards (Squares, Dots, Rounded) */
+
 .design-selector {
     display: grid;
     grid-template-columns: repeat(3, 1fr);
@@ -358,7 +358,7 @@ textarea#urlInput:focus {
     box-shadow: 0 0 12px rgba(0, 210, 255, 0.15);
 }
 
-/* Eye preview shapes */
+
 .eye-preview {
     width: 22px;
     height: 22px;
@@ -385,7 +385,7 @@ textarea#urlInput:focus {
 .eye-preview.rounded::after { border-radius: 2px; }
 .eye-preview.circle::after { border-radius: 50%; }
 
-/* Color Controls */
+
 .toggle-group {
     display: flex;
     background: var(--surface-1);
@@ -452,7 +452,7 @@ textarea#urlInput:focus {
     color: var(--text-secondary);
 }
 
-/* Sliders */
+
 .slider-row {
     display: flex;
     flex-direction: column;
@@ -496,7 +496,7 @@ input[type="range"]::-webkit-slider-thumb:hover {
     transform: scale(1.15);
 }
 
-/* Accordion for Eye Colors */
+
 .accordion-header {
     display: flex;
     justify-content: space-between;
@@ -520,7 +520,7 @@ input[type="range"]::-webkit-slider-thumb:hover {
     margin-top: 8px;
 }
 
-/* Background selector & checkbox */
+
 .bg-selector {
     display: flex;
     flex-direction: column;
@@ -542,7 +542,7 @@ input[type="range"]::-webkit-slider-thumb:hover {
     accent-color: var(--accent);
 }
 
-/* Logo Dropzone */
+
 .upload-dropzone {
     border: 2px dashed var(--input-border);
     border-radius: var(--radius-lg);
@@ -582,7 +582,7 @@ input[type="range"]::-webkit-slider-thumb:hover {
     color: var(--text-muted);
 }
 
-/* Active Logo Card */
+
 .active-logo-card {
     display: flex;
     align-items: center;
@@ -640,7 +640,7 @@ input[type="range"]::-webkit-slider-thumb:hover {
     color: #ef4444;
 }
 
-/* Shape Icons for Logo Badge */
+
 .shape-icon {
     width: 20px;
     height: 20px;
@@ -652,7 +652,7 @@ input[type="range"]::-webkit-slider-thumb:hover {
 .shape-icon.square { border-radius: 4px; }
 .shape-icon.none { border: 2px dashed currentColor; }
 
-/* Correction Selector */
+
 .correction-selector {
     display: grid;
     grid-template-columns: 1fr 1fr;
@@ -733,7 +733,7 @@ input[type="range"]::-webkit-slider-thumb:hover {
     font-family: inherit;
 }
 
-/* Right Column: Sticky Live Preview Panel */
+
 .studio-preview {
     position: sticky;
     top: 32px;
@@ -780,7 +780,7 @@ input[type="range"]::-webkit-slider-thumb:hover {
     border: 1px solid rgba(0, 210, 255, 0.3);
 }
 
-/* Live QR Stage */
+
 .qr-stage {
     background: rgba(0, 0, 0, 0.4);
     padding: 24px;
@@ -809,7 +809,7 @@ input[type="range"]::-webkit-slider-thumb:hover {
     transition: transform 0.2s ease;
 }
 
-/* Primary Actions: Figma & Image Copy */
+
 .primary-actions {
     display: flex;
     flex-direction: column;
@@ -869,7 +869,7 @@ input[type="range"]::-webkit-slider-thumb:hover {
     border-color: var(--text-secondary);
 }
 
-/* Download Grid (PNG, SVG, JPG, PDF) */
+
 .download-grid {
     display: grid;
     grid-template-columns: 1fr 1fr;
@@ -926,7 +926,7 @@ input[type="range"]::-webkit-slider-thumb:hover {
     line-height: 1.4;
 }
 
-/* Toast System */
+
 .toast {
     position: fixed;
     bottom: 32px;
@@ -960,7 +960,7 @@ input[type="range"]::-webkit-slider-thumb:hover {
 .toast.warning { border-color: #f59e0b; color: #fde68a; }
 .toast.error { border-color: #ef4444; color: #fca5a5; }
 
-/* Utilities */
+
 .hidden {
     display: none !important;
 }
@@ -970,7 +970,7 @@ input[type="range"]::-webkit-slider-thumb:hover {
     to { opacity: 1; transform: translateY(0); }
 }
 
-/* Mobile & Tablet Responsiveness */
+
 @media (max-width: 900px) {
     .studio-container {
         grid-template-columns: 1fr;
