@@ -13,7 +13,6 @@
 <body>
     <div class="ambient-glow"></div>
 
-    <!-- Header Navigation -->
     <header class="studio-nav">
         <div class="nav-brand">
             <div class="brand-text">
@@ -30,11 +29,8 @@
         </div>
     </header>
 
-    <!-- Main Studio Layout -->
     <main class="studio-container">
-        <!-- Left Column: Editing Panel -->
         <section class="studio-controls" aria-label="Editor controls">
-            <!-- Tabs Bar -->
             <nav class="tabs-bar" role="tablist">
                 <button type="button" class="tab-btn active" data-tab="tab-content" role="tab">Content</button>
                 <button type="button" class="tab-btn" data-tab="tab-design" role="tab">Design</button>
@@ -44,7 +40,6 @@
             </nav>
 
             <div class="tab-panels">
-                <!-- 1. Content Tab -->
                 <div class="tab-panel active" id="tab-content" role="tabpanel">
                     <div class="field-group">
                         <label class="field-label">Quick Presets</label>
@@ -66,7 +61,6 @@
                     </div>
                 </div>
 
-                <!-- 2. Design Tab: 3 QR Designs & Eyes -->
                 <div class="tab-panel" id="tab-design" role="tabpanel">
                     <div class="field-group">
                         <label class="field-label">Module Pattern Style</label>
@@ -138,7 +132,6 @@
                     </div>
                 </div>
 
-                <!-- 3. Colors Tab: Solid & Linear Gradients -->
                 <div class="tab-panel" id="tab-colors" role="tabpanel">
                     <div class="field-group">
                         <label class="field-label">Color Mode</label>
@@ -148,7 +141,6 @@
                         </div>
                     </div>
 
-                    <!-- Solid Color Picker -->
                     <div class="field-group" id="solidColorControls">
                         <label class="field-label">Foreground Color</label>
                         <div class="color-picker-item">
@@ -157,7 +149,6 @@
                         </div>
                     </div>
 
-                    <!-- Gradient Color Pickers -->
                     <div class="gradient-controls hidden" id="gradientControls">
                         <div class="dual-colors">
                             <div class="color-picker-item">
@@ -182,7 +173,6 @@
                         </div>
                     </div>
 
-                    <!-- Eye Colors (Optional Customization) -->
                     <div class="field-group">
                         <div class="accordion-header" id="toggleEyeColors">
                             <span>Custom Eye Colors</span>
@@ -208,7 +198,6 @@
                         </div>
                     </div>
 
-                    <!-- Background Color -->
                     <div class="field-group">
                         <label class="field-label">Background</label>
                         <div class="bg-selector">
@@ -224,7 +213,6 @@
                     </div>
                 </div>
 
-                <!-- 4. Logo Tab -->
                 <div class="tab-panel" id="tab-logo" role="tabpanel">
                     <div class="field-group">
                         <label class="field-label">Upload Custom Logo</label>
@@ -239,7 +227,6 @@
                             <span class="dropzone-sub">Supports PNG, SVG, JPG, WebP</span>
                         </div>
 
-                        <!-- Active Logo Preview Card -->
                         <div class="active-logo-card hidden" id="activeLogoCard">
                             <img id="logoThumb" src="" alt="Logo Thumbnail">
                             <div class="logo-info">
@@ -281,7 +268,6 @@
                             </label>
                         </div>
 
-                        <!-- Badge Customization Options -->
                         <div class="field-group" style="margin-top: 12px;">
                             <label class="field-label">Badge Background</label>
                             <div class="bg-selector">
@@ -307,7 +293,6 @@
                     </div>
                 </div>
 
-                <!-- 5. Precision & Settings Tab -->
                 <div class="tab-panel" id="tab-precision" role="tabpanel">
                     <div class="field-group">
                         <label class="field-label">Error Correction Level</label>
@@ -368,7 +353,6 @@
             </div>
         </section>
 
-        <!-- Right Column: Sticky Live Preview Panel -->
         <section class="studio-preview" aria-label="Live preview and export">
             <div class="preview-card">
                 <div class="preview-header">
@@ -376,13 +360,11 @@
                     <span class="preview-format-tag" id="previewModeTag">VECTOR SVG</span>
                 </div>
 
-                <!-- Live Render Container -->
                 <div class="qr-stage" id="qrStage">
                     <div id="svgContainer" class="svg-stage-box"></div>
                     <canvas id="exportCanvas" class="hidden"></canvas>
                 </div>
 
-                <!-- Primary Clipboard Actions (Figma & Image) -->
                 <div class="primary-actions">
                     <button type="button" class="btn-figma" id="copyFigmaBtn" title="Copy clean SVG for Figma vector frame import">
                         <svg viewBox="0 0 38 57" width="18" height="26" fill="currentColor">
@@ -403,7 +385,6 @@
                     </button>
                 </div>
 
-                <!-- Download Buttons Grid -->
                 <div class="download-grid">
                     <button type="button" class="dl-btn" id="dlPngBtn">
                         <span class="dl-ext">PNG</span>
@@ -430,11 +411,7 @@
         </section>
     </main>
 
-    <!-- Toast Notification -->
     <div id="toast" class="toast hidden"></div>
-
-    <!-- Hidden download link for triggering file saves -->
-    <a id="downloadAnchor" class="hidden"></a>
 
     <script src="qrcode.min.js"></script>
     <script src="qr-engine.js"></script>

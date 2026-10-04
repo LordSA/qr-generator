@@ -27,7 +27,6 @@ MIME_TYPES = {
 
 class handler(BaseHTTPRequestHandler):
     def do_OPTIONS(self):
-        """Handle CORS pre-flight requests."""
         self.send_response(204)
         self.send_header('Access-Control-Allow-Origin', '*')
         self.send_header('Access-Control-Allow-Methods', 'GET, OPTIONS')
@@ -38,7 +37,6 @@ class handler(BaseHTTPRequestHandler):
         parsed = urlparse(self.path)
         path = parsed.path.rstrip('/')
 
-        # 1. API Route: /api, /api/index, /api/index.py
         if path in ('/api', '/api/index', '/api/index.py') or path.startswith('/api/'):
             query_comp = parse_qs(parsed.query)
             url_to_encode = query_comp.get('url', [None])[0]
@@ -89,14 +87,12 @@ class handler(BaseHTTPRequestHandler):
                 self.wfile.write(f'{{"error": "{str(e)}"}}'.encode('utf-8'))
             return
 
-        # 2. Static File Serving (for local execution)
         rel_path = parsed.path.lstrip('/')
         if not rel_path:
             rel_path = 'index.html'
 
         file_path = os.path.normpath(os.path.join(PUBLIC_DIR, rel_path))
 
-        # Prevent directory traversal
         if not file_path.startswith(PUBLIC_DIR):
             self.send_response(403)
             self.send_header('Content-Type', 'text/plain')
