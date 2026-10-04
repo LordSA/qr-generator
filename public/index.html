@@ -3,28 +3,106 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>QR Generator</title>
+    <title>QR Generator - Fast & Customizable</title>
     <link rel="stylesheet" href="style.css">
     <link rel="icon" href="logo.png">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
 </head>
 <body>
+    <div class="background-glow"></div>
 
-    <div class="container">
-        <h1>Generate Link</h1>
-        <p>Enter a URL below to generate your permanent QR code.</p>
+    <main class="container">
+        <header class="header">
+            <div class="logo-wrapper">
+                <img src="logo.png" alt="Logo" class="brand-logo" onerror="this.style.display='none'">
+                <h1>QR Code Generator</h1>
+            </div>
+            <p>Generate high-quality, permanent QR codes instantly for any link or text.</p>
+        </header>
         
-        <div class="input-group">
-            <input type="url" id="urlInput" placeholder="https://example.com" required>
-            <button onclick="generateQR()">Generate</button>
+        <div class="quick-types">
+            <button type="button" class="chip active" data-placeholder="https://example.com" data-type="url">Link</button>
+            <button type="button" class="chip" data-placeholder="Type any message, note or secret..." data-type="text">Text</button>
+            <button type="button" class="chip" data-placeholder="WIFI:S:MyNetwork;T:WPA;P:MyPassword;;" data-type="wifi">Wi-Fi</button>
+            <button type="button" class="chip" data-placeholder="mailto:contact@example.com?subject=Hello" data-type="email">Email</button>
         </div>
 
-        <div id="qr-result" class="hidden">
-            <img id="qrImage" alt="Generated QR Code" />
-            <br>
-            <a id="downloadLink" href="#" download="qrcode.png">Download PNG</a>
-        </div>
-    </div>
+        <div class="input-card">
+            <div class="input-wrapper">
+                <svg class="input-icon" viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2">
+                    <path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"></path>
+                    <path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"></path>
+                </svg>
+                <input type="text" id="urlInput" placeholder="https://example.com" autocomplete="off" spellcheck="false">
+                <button type="button" id="clearBtn" class="clear-btn" title="Clear input" aria-label="Clear">✕</button>
+            </div>
 
+            <!-- Customization controls toggle -->
+            <button type="button" class="accordion-toggle" id="toggleOptions">
+                <span>Customize Colors & Size</span>
+                <span class="chevron">▼</span>
+            </button>
+
+            <div class="options-panel hidden" id="optionsPanel">
+                <div class="option-row">
+                    <label for="fgColor">Foreground:</label>
+                    <input type="color" id="fgColor" value="#000000">
+                </div>
+                <div class="option-row">
+                    <label for="bgColor">Background:</label>
+                    <input type="color" id="bgColor" value="#ffffff">
+                </div>
+                <div class="option-row">
+                    <label for="qrSize">Size:</label>
+                    <select id="qrSize">
+                        <option value="180">Small (180px)</option>
+                        <option value="240" selected>Medium (240px)</option>
+                        <option value="320">Large (320px)</option>
+                        <option value="480">High-Res (480px)</option>
+                    </select>
+                </div>
+            </div>
+
+            <button type="button" class="btn-primary" id="generateBtn" onclick="generateQR()">Generate QR Code</button>
+        </div>
+
+        <!-- Result section -->
+        <section id="qr-result" class="hidden result-card" aria-live="polite">
+            <div class="qr-canvas-box" id="qrContainer">
+                <img id="qrImage" alt="Generated QR Code" />
+            </div>
+
+            <div class="action-buttons">
+                <a id="downloadLink" href="#" download="qrcode.png" class="btn-download">
+                    <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2">
+                        <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path>
+                        <polyline points="7 10 12 15 17 10"></polyline>
+                        <line x1="12" y1="15" x2="12" y2="3"></line>
+                    </svg>
+                    Download PNG
+                </a>
+                <button type="button" id="copyBtn" class="btn-secondary" title="Copy to clipboard">
+                    <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2">
+                        <rect x="9" y="9" width="13" height="13" rx="2" ry="2"></rect>
+                        <path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"></path>
+                    </svg>
+                    Copy Image
+                </button>
+            </div>
+            
+            <div class="api-info-bar">
+                <span class="status-indicator online"></span>
+                <span class="status-text">Client & Python API Ready</span>
+                <button type="button" id="testApiBtn" class="link-btn" title="Test generating via Python server">Test Backend API</button>
+            </div>
+        </section>
+
+        <div id="toast" class="toast hidden"></div>
+    </main>
+
+    <script src="qrcode.min.js"></script>
     <script src="script.js"></script>
 </body>
 </html>
