@@ -64,11 +64,21 @@
         /**
          * Calculates the safe cutout area for central logos
          */
-        getLogoSafeBounds(moduleCount, logoRatio = 0.2, margin = 2) {
+        getLogoSafeBounds(moduleCount, logoRatio = 0.2, margin = 1) {
             const logoModules = Math.ceil(moduleCount * logoRatio);
-            const start = Math.floor((moduleCount - logoModules) / 2) - margin;
-            const end = start + logoModules + (margin * 2);
-            return { start, end };
+            let start = Math.floor((moduleCount - logoModules) / 2) - margin;
+            let end = Math.floor((moduleCount - logoModules) / 2) + logoModules + margin;
+
+            // Strict protection of finder eyes and timing tracks (0..7 and count-7..count)
+            start = Math.max(start, 7);
+            end = Math.min(end, moduleCount - 7);
+
+            return {
+                start,
+                end,
+                center: (moduleCount - 1) / 2,
+                radius: (end - start) / 2
+            };
         }
 
         /**
@@ -91,7 +101,7 @@
                 eyeStyle = 'square', // 'square' | 'rounded' | 'circle'
                 eyeOuterColor = '',
                 eyeInnerColor = '',
-                logo = null // { dataUrl, sizeRatio: 0.2, shape: 'circle' | 'square', bgPadding: 4 }
+                logo = null // { dataUrl, sizeRatio: 0.2, shape: 'circle' | 'square' | 'none', padding: 1, bgColor, hasBorder, borderColor }
             } = options;
 
             const { matrix, moduleCount } = this.getMatrix(text, correctionLevel);
@@ -127,8 +137,9 @@
             const hasLogo = logo && logo.dataUrl;
             let logoBounds = null;
             if (hasLogo) {
-                const ratio = Math.min(Math.max(logo.sizeRatio || 0.2, 0.12), 0.26);
-                logoBounds = this.getLogoSafeBounds(moduleCount, ratio, logo.bgPadding || 1);
+                const ratio = Math.min(Math.max(logo.sizeRatio || 0.2, 0.12), 0.25);
+                const paddingModules = (typeof logo.padding === 'number') ? logo.padding : 1;
+                logoBounds = this.getLogoSafeBounds(moduleCount, ratio, paddingModules);
             }
 
             // Draw Data Modules
@@ -137,9 +148,17 @@
                 for (let c = 0; c < moduleCount; c++) {
                     if (this.isFinderEye(r, c, moduleCount)) continue;
 
-                    // Skip if inside logo cutout
-                    if (hasLogo && r >= logoBounds.start && r < logoBounds.end && c >= logoBounds.start && c < logoBounds.end) {
-                        continue;
+                    // Skip modules inside logo cutout
+                    if (hasLogo) {
+                        const shape = logo.shape || 'circle';
+                        if (shape === 'circle') {
+                            const dist = Math.hypot(r - logoBounds.center, c - logoBounds.center);
+                            if (dist <= logoBounds.radius + 0.2) continue;
+                        } else {
+                            if (r >= logoBounds.start && r < logoBounds.end && c >= logoBounds.start && c < logoBounds.end) {
+                                continue;
+                            }
+                        }
                     }
 
                     if (matrix[r][c] === 1) {
@@ -170,35 +189,36 @@
             // Draw Logo Element
             let logoSVG = '';
             if (hasLogo) {
-                const logoSize = size * (logo.sizeRatio || 0.2);
-                const logoX = (size - logoSize) / 2;
-                const logoY = (size - logoSize) / 2;
-                const padding = 6;
-                const bgSize = logoSize + (padding * 2);
-                const bgX = logoX - padding;
-                const bgY = logoY - padding;
+                const logoScale = Math.min(Math.max(logo.sizeRatio || 0.2, 0.12), 0.25);
+                const logoArea = size * logoScale;
+                const logoPad = 6;
+                const badgeSize = logoArea + (logoPad * 2);
+                const badgeX = (size - badgeSize) / 2;
+                const badgeY = (size - badgeSize) / 2;
+                const logoX = (size - logoArea) / 2;
+                const logoY = (size - logoArea) / 2;
 
                 const shape = logo.shape || 'circle';
-                let logoBgShape = '';
-                let clipPathDef = '';
-                let clipAttr = '';
+                const badgeBg = logo.bgColor || (transparentBg ? '#ffffff' : bgColor);
+                const hasBorder = logo.hasBorder !== false;
+                const borderStroke = hasBorder ? (logo.borderColor || 'rgba(0, 0, 0, 0.12)') : 'none';
+                const borderWidth = hasBorder ? 1.5 : 0;
 
+                let badgeShapeSVG = '';
                 if (shape === 'circle') {
-                    const r = bgSize / 2;
-                    logoBgShape = `<circle cx="${(bgX + r).toFixed(2)}" cy="${(bgY + r).toFixed(2)}" r="${r.toFixed(2)}" fill="${logo.bgColor || '#ffffff'}" />`;
-                    clipPathDef = `<clipPath id="logo-clip"><circle cx="${(logoX + logoSize/2).toFixed(2)}" cy="${(logoY + logoSize/2).toFixed(2)}" r="${(logoSize/2).toFixed(2)}" /></clipPath>`;
-                    clipAttr = 'clip-path="url(#logo-clip)"';
+                    const cx = size / 2;
+                    const cy = size / 2;
+                    const r = badgeSize / 2;
+                    badgeShapeSVG = `<circle id="Badge-Background" cx="${cx.toFixed(2)}" cy="${cy.toFixed(2)}" r="${r.toFixed(2)}" fill="${badgeBg}" stroke="${borderStroke}" stroke-width="${borderWidth}" />`;
                 } else if (shape === 'square') {
-                    logoBgShape = `<rect x="${bgX.toFixed(2)}" y="${bgY.toFixed(2)}" width="${bgSize.toFixed(2)}" height="${bgSize.toFixed(2)}" rx="8" ry="8" fill="${logo.bgColor || '#ffffff'}" />`;
-                    clipPathDef = `<clipPath id="logo-clip"><rect x="${logoX.toFixed(2)}" y="${logoY.toFixed(2)}" width="${logoSize.toFixed(2)}" height="${logoSize.toFixed(2)}" rx="6" ry="6" /></clipPath>`;
-                    clipAttr = 'clip-path="url(#logo-clip)"';
+                    const rx = (badgeSize * 0.18).toFixed(2);
+                    badgeShapeSVG = `<rect id="Badge-Background" x="${badgeX.toFixed(2)}" y="${badgeY.toFixed(2)}" width="${badgeSize.toFixed(2)}" height="${badgeSize.toFixed(2)}" rx="${rx}" ry="${rx}" fill="${badgeBg}" stroke="${borderStroke}" stroke-width="${borderWidth}" />`;
                 }
 
                 logoSVG = `
     <g id="Logo-Badge">
-      ${clipPathDef}
-      ${logoBgShape}
-      <image href="${logo.dataUrl}" x="${logoX.toFixed(2)}" y="${logoY.toFixed(2)}" width="${logoSize.toFixed(2)}" height="${logoSize.toFixed(2)}" ${clipAttr} preserveAspectRatio="xMidYMid meet" />
+      ${badgeShapeSVG}
+      <image id="Logo-Image" href="${logo.dataUrl}" x="${logoX.toFixed(2)}" y="${logoY.toFixed(2)}" width="${logoArea.toFixed(2)}" height="${logoArea.toFixed(2)}" preserveAspectRatio="xMidYMid meet" />
     </g>`;
             }
 
@@ -297,7 +317,64 @@
                     ctx.clearRect(0, 0, canvas.width, canvas.height);
                     ctx.drawImage(img, 0, 0);
                     URL.revokeObjectURL(url);
-                    resolve(canvas);
+
+                    // If logo is attached, ensure badge and logo render reliably to canvas
+                    if (options.logo && options.logo.dataUrl) {
+                        const logoImg = new Image();
+                        logoImg.onload = () => {
+                            const size = canvas.width;
+                            const logoScale = Math.min(Math.max(options.logo.sizeRatio || 0.2, 0.12), 0.25);
+                            const logoArea = size * logoScale;
+                            const logoPad = 6;
+                            const badgeSize = logoArea + (logoPad * 2);
+                            const badgeX = (size - badgeSize) / 2;
+                            const badgeY = (size - badgeSize) / 2;
+                            const logoX = (size - logoArea) / 2;
+                            const logoY = (size - logoArea) / 2;
+
+                            const shape = options.logo.shape || 'circle';
+                            const badgeBg = options.logo.bgColor || (options.transparentBg ? '#ffffff' : (options.bgColor || '#ffffff'));
+                            const hasBorder = options.logo.hasBorder !== false;
+                            const borderColor = options.logo.borderColor || 'rgba(0, 0, 0, 0.12)';
+
+                            if (shape === 'circle') {
+                                const cx = size / 2;
+                                const cy = size / 2;
+                                const r = badgeSize / 2;
+                                ctx.beginPath();
+                                ctx.arc(cx, cy, r, 0, Math.PI * 2);
+                                ctx.fillStyle = badgeBg;
+                                ctx.fill();
+                                if (hasBorder) {
+                                    ctx.strokeStyle = borderColor;
+                                    ctx.lineWidth = 1.5;
+                                    ctx.stroke();
+                                }
+                            } else if (shape === 'square') {
+                                const rx = badgeSize * 0.18;
+                                ctx.beginPath();
+                                if (ctx.roundRect) {
+                                    ctx.roundRect(badgeX, badgeY, badgeSize, badgeSize, rx);
+                                } else {
+                                    ctx.rect(badgeX, badgeY, badgeSize, badgeSize);
+                                }
+                                ctx.fillStyle = badgeBg;
+                                ctx.fill();
+                                if (hasBorder) {
+                                    ctx.strokeStyle = borderColor;
+                                    ctx.lineWidth = 1.5;
+                                    ctx.stroke();
+                                }
+                            }
+
+                            ctx.drawImage(logoImg, logoX, logoY, logoArea, logoArea);
+                            resolve(canvas);
+                        };
+                        logoImg.onerror = () => resolve(canvas);
+                        logoImg.src = options.logo.dataUrl;
+                    } else {
+                        resolve(canvas);
+                    }
                 };
                 img.onerror = (err) => {
                     URL.revokeObjectURL(url);

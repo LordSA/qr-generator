@@ -244,7 +244,7 @@
                             <img id="logoThumb" src="" alt="Logo Thumbnail">
                             <div class="logo-info">
                                 <span class="logo-name" id="logoFileName">logo.png</span>
-                                <span class="badge-safe">Auto Error Correction (H - 30%)</span>
+                                <span class="badge-safe">🔒 Locked to Level H (30%)</span>
                             </div>
                             <button type="button" id="removeLogoBtn" class="btn-remove" title="Remove logo">✕</button>
                         </div>
@@ -256,7 +256,7 @@
                             <input type="range" id="logoSizeRatio" min="12" max="25" value="20" step="1">
                         </div>
 
-                        <label class="field-label" style="margin-top: 12px;">Logo Badge Background</label>
+                        <label class="field-label" style="margin-top: 10px;">Logo Badge Shape</label>
                         <div class="design-selector">
                             <label class="design-card active">
                                 <input type="radio" name="logoShape" value="circle" checked>
@@ -280,6 +280,30 @@
                                 </div>
                             </label>
                         </div>
+
+                        <!-- Badge Customization Options -->
+                        <div class="field-group" style="margin-top: 12px;">
+                            <label class="field-label">Badge Background</label>
+                            <div class="bg-selector">
+                                <div class="color-picker-item" id="logoBgColorWrapper">
+                                    <input type="color" id="logoBgColorInput" value="#ffffff">
+                                    <span class="color-hex" id="logoBgColorHex">#ffffff</span>
+                                </div>
+                                <label class="checkbox-label">
+                                    <input type="checkbox" id="matchQrBg" checked>
+                                    <span>Auto-match QR Background</span>
+                                </label>
+                                <label class="checkbox-label">
+                                    <input type="checkbox" id="logoBorder" checked>
+                                    <span>Badge Outline Border (Figma / Print Contrast)</span>
+                                </label>
+                            </div>
+                        </div>
+
+                        <div class="slider-row" style="margin-top: 10px;">
+                            <label for="logoPadding">Module Cutout Margin: <strong id="logoPaddingVal">1 module</strong></label>
+                            <input type="range" id="logoPadding" min="0" max="3" value="1" step="1">
+                        </div>
                     </div>
                 </div>
 
@@ -287,29 +311,33 @@
                 <div class="tab-panel" id="tab-precision" role="tabpanel">
                     <div class="field-group">
                         <label class="field-label">Error Correction Level</label>
+                        <div class="correction-notice hidden" id="logoCorrectionNotice">
+                            <span class="badge-lock">🔒 Protected for Logo</span>
+                            <span class="notice-desc">Level H (30%) is active to ensure error-free camera scanning with embedded logos.</span>
+                        </div>
                         <div class="correction-selector">
-                            <label class="correction-card">
+                            <label class="correction-card" id="cardL">
                                 <input type="radio" name="correctionLevel" value="L">
                                 <div class="card-content">
                                     <strong>Low (7%)</strong>
                                     <span>Highest density</span>
                                 </div>
                             </label>
-                            <label class="correction-card">
+                            <label class="correction-card" id="cardM">
                                 <input type="radio" name="correctionLevel" value="M">
                                 <div class="card-content">
                                     <strong>Medium (15%)</strong>
                                     <span>Standard default</span>
                                 </div>
                             </label>
-                            <label class="correction-card">
+                            <label class="correction-card" id="cardQ">
                                 <input type="radio" name="correctionLevel" value="Q">
                                 <div class="card-content">
                                     <strong>Quartile (25%)</strong>
                                     <span>Higher tolerance</span>
                                 </div>
                             </label>
-                            <label class="correction-card active">
+                            <label class="correction-card active" id="cardH">
                                 <input type="radio" name="correctionLevel" value="H" checked>
                                 <div class="card-content">
                                     <strong>High (30%)</strong>

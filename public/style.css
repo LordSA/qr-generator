@@ -690,6 +690,37 @@ input[type="range"]::-webkit-slider-thumb:hover {
     color: var(--text-primary);
 }
 
+.correction-card.disabled {
+    opacity: 0.35;
+    pointer-events: none;
+    cursor: not-allowed;
+    filter: grayscale(0.8);
+}
+
+.correction-notice {
+    background: rgba(16, 185, 129, 0.1);
+    border: 1px solid rgba(16, 185, 129, 0.3);
+    border-radius: var(--radius-sm);
+    padding: 10px 14px;
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+    margin-bottom: 8px;
+    animation: fadeIn 0.2s ease-out;
+}
+
+.badge-lock {
+    font-size: 0.78rem;
+    font-weight: 700;
+    color: #6ee7b7;
+}
+
+.notice-desc {
+    font-size: 0.76rem;
+    color: var(--text-secondary);
+    line-height: 1.4;
+}
+
 .select-field {
     background: var(--surface-1);
     border: 1.5px solid var(--input-border);

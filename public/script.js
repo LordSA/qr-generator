@@ -237,7 +237,40 @@
         }
     }
 
-    // Logo Handling
+    // Logo Handling & Protection
+    function updateCorrectionUIForLogo(hasLogo) {
+        const notice = document.getElementById('logoCorrectionNotice');
+        const cardL = document.getElementById('cardL');
+        const cardM = document.getElementById('cardM');
+        const radioL = document.querySelector('input[name="correctionLevel"][value="L"]');
+        const radioM = document.querySelector('input[name="correctionLevel"][value="M"]');
+        const radioH = document.querySelector('input[name="correctionLevel"][value="H"]');
+
+        if (hasLogo) {
+            // Lock to Level H (or Q)
+            if (notice) notice.classList.remove('hidden');
+            if (cardL) cardL.classList.add('disabled');
+            if (cardM) cardM.classList.add('disabled');
+            if (radioL) radioL.disabled = true;
+            if (radioM) radioM.disabled = true;
+
+            // Ensure state is set to Level H
+            state.correctionLevel = 'H';
+            if (radioH) {
+                radioH.checked = true;
+                document.querySelectorAll('.correction-card').forEach(c => c.classList.remove('active'));
+                radioH.closest('.correction-card')?.classList.add('active');
+            }
+        } else {
+            // Restore all options
+            if (notice) notice.classList.add('hidden');
+            if (cardL) cardL.classList.remove('disabled');
+            if (cardM) cardM.classList.remove('disabled');
+            if (radioL) radioL.disabled = false;
+            if (radioM) radioM.disabled = false;
+        }
+    }
+
     function handleLogoFile(file) {
         if (!file || !file.type.startsWith('image/')) {
             showToast('Please upload a valid image file (PNG, SVG, JPG, WebP).', 'warning');
@@ -249,24 +282,25 @@
             const dataUrl = e.target.result;
             const sizeRatio = parseInt(document.getElementById('logoSizeRatio')?.value || '20', 10) / 100;
             const shape = document.querySelector('input[name="logoShape"]:checked')?.value || 'circle';
+            const padding = parseInt(document.getElementById('logoPadding')?.value || '1', 10);
+            const matchBg = document.getElementById('matchQrBg')?.checked ?? true;
+            const customBg = document.getElementById('logoBgColorInput')?.value || '#ffffff';
+            const hasBorder = document.getElementById('logoBorder')?.checked ?? true;
 
             state.logo = {
                 dataUrl,
                 fileName: file.name,
                 sizeRatio,
                 shape,
-                bgPadding: 2,
-                bgColor: '#ffffff'
+                padding,
+                matchBg,
+                bgColor: matchBg ? (state.transparentBg ? '#ffffff' : state.bgColor) : customBg,
+                hasBorder,
+                borderColor: 'rgba(0, 0, 0, 0.15)'
             };
 
-            // Auto-elevate error correction to Level H (30%)
-            state.correctionLevel = 'H';
-            const hRadio = document.querySelector('input[name="correctionLevel"][value="H"]');
-            if (hRadio) {
-                hRadio.checked = true;
-                document.querySelectorAll('.correction-card').forEach(c => c.classList.remove('active'));
-                hRadio.closest('.correction-card')?.classList.add('active');
-            }
+            // Enforce Error Correction Level H (30%)
+            updateCorrectionUIForLogo(true);
 
             // Update UI card
             const activeCard = document.getElementById('activeLogoCard');
@@ -278,7 +312,7 @@
                 activeCard.classList.remove('hidden');
             }
 
-            showToast('Logo added! Auto-elevated error correction to 30% (High).', 'success');
+            showToast('✓ Logo added! Error correction locked to Level H (30%) for scannability.', 'success');
             scheduleRender();
         };
         reader.readAsDataURL(file);
@@ -290,7 +324,11 @@
         const fileInput = document.getElementById('logoFileInput');
         if (activeCard) activeCard.classList.add('hidden');
         if (fileInput) fileInput.value = '';
-        showToast('Logo removed.', 'info');
+
+        // Re-enable low/medium correction
+        updateCorrectionUIForLogo(false);
+
+        showToast('Logo removed. All error correction levels restored.', 'info');
         scheduleRender();
     }
 
@@ -552,9 +590,73 @@
             });
         });
 
-        // 8. Error Correction Level
+        // Logo Badge Background & Border Listeners
+        const logoBgInput = document.getElementById('logoBgColorInput');
+        const logoBgHex = document.getElementById('logoBgColorHex');
+        const matchQrBgCheck = document.getElementById('matchQrBg');
+        const logoBorderCheck = document.getElementById('logoBorder');
+        const logoPaddingSlider = document.getElementById('logoPadding');
+        const logoPaddingVal = document.getElementById('logoPaddingVal');
+
+        if (logoBgInput) {
+            logoBgInput.addEventListener('input', () => {
+                if (logoBgHex) logoBgHex.textContent = logoBgInput.value;
+                if (matchQrBgCheck) matchQrBgCheck.checked = false;
+                if (state.logo) {
+                    state.logo.matchBg = false;
+                    state.logo.bgColor = logoBgInput.value;
+                    scheduleRender();
+                }
+            });
+        }
+
+        if (matchQrBgCheck) {
+            matchQrBgCheck.addEventListener('change', () => {
+                if (state.logo) {
+                    state.logo.matchBg = matchQrBgCheck.checked;
+                    state.logo.bgColor = matchQrBgCheck.checked 
+                        ? (state.transparentBg ? '#ffffff' : state.bgColor) 
+                        : (logoBgInput ? logoBgInput.value : '#ffffff');
+                    scheduleRender();
+                }
+            });
+        }
+
+        if (logoBorderCheck) {
+            logoBorderCheck.addEventListener('change', () => {
+                if (state.logo) {
+                    state.logo.hasBorder = logoBorderCheck.checked;
+                    scheduleRender();
+                }
+            });
+        }
+
+        if (logoPaddingSlider) {
+            logoPaddingSlider.addEventListener('input', () => {
+                const pad = parseInt(logoPaddingSlider.value, 10);
+                if (logoPaddingVal) logoPaddingVal.textContent = `${pad} module${pad === 1 ? '' : 's'}`;
+                if (state.logo) {
+                    state.logo.padding = pad;
+                    scheduleRender();
+                }
+            });
+        }
+
+        // 8. Error Correction Level with Logo Safeguard
         document.querySelectorAll('input[name="correctionLevel"]').forEach(radio => {
             radio.addEventListener('change', (e) => {
+                if (state.logo && (e.target.value === 'L' || e.target.value === 'M')) {
+                    showToast('⚠️ Low/Medium error correction is disabled to guarantee logo scannability.', 'warning');
+                    const hRadio = document.querySelector('input[name="correctionLevel"][value="H"]');
+                    if (hRadio) {
+                        hRadio.checked = true;
+                        document.querySelectorAll('.correction-card').forEach(r => r.classList.remove('active'));
+                        hRadio.closest('.correction-card')?.classList.add('active');
+                        state.correctionLevel = 'H';
+                    }
+                    return;
+                }
+
                 document.querySelectorAll('input[name="correctionLevel"]').forEach(r => {
                     r.closest('.correction-card')?.classList.remove('active');
                 });
