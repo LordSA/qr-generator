@@ -1,113 +1,415 @@
 <!DOCTYPE html>
 <html lang="en">
-
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>QR Generator - Fast & Customizable</title>
+    <title>QR Studio - Professional Vector & Custom QR Generator</title>
     <link rel="stylesheet" href="style.css">
     <link rel="icon" href="logo.png">
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700&display=swap"
-        rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
 </head>
-
 <body>
-    <div class="background-glow"></div>
+    <div class="ambient-glow"></div>
 
-    <main class="container">
-        <header class="header">
-            <div class="logo-wrapper">
-                <img src="logo.png" alt="Logo" class="brand-logo" onerror="this.style.display='none'">
-                <h1>QR Code Generator</h1>
+    <!-- Header Navigation -->
+    <header class="studio-nav">
+        <div class="nav-brand">
+            <div class="brand-text">
+                <span class="brand-title">QR STUDIO</span>
+                <span class="brand-badge">PRO</span>
             </div>
-            <p>Generate high-quality, permanent QR codes instantly for any link or text.</p>
-        </header>
-
-        <div class="quick-types">
-            <button type="button" class="chip active" data-placeholder="https://example.com"
-                data-type="url">Link</button>
-            <button type="button" class="chip" data-placeholder="Type any message, note or secret..."
-                data-type="text">Text</button>
-            <button type="button" class="chip" data-placeholder="WIFI:S:MyNetwork;T:WPA;P:MyPassword;;"
-                data-type="wifi">Wi-Fi</button>
-            <button type="button" class="chip" data-placeholder="mailto:contact@example.com?subject=Hello"
-                data-type="email">Email</button>
         </div>
-
-        <div class="input-card">
-            <div class="input-wrapper">
-                <svg class="input-icon" viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor"
-                    stroke-width="2">
-                    <path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"></path>
-                    <path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"></path>
+        <div class="nav-actions">
+            <a href="https://github.com/LordSA/qr-generator" target="_blank" rel="noreferrer" class="github-link" title="View Source on GitHub">
+                <svg viewBox="0 0 24 24" width="18" height="18" fill="currentColor">
+                    <path d="M12 0C5.37 0 0 5.37 0 12c0 5.31 3.435 9.795 8.205 11.385.6.105.825-.255.825-.57 0-.285-.015-1.23-.015-2.235-3.015.555-3.795-.735-4.035-1.41-.135-.345-.72-1.41-1.23-1.695-.42-.225-1.02-.78-.015-.795.945-.015 1.62.87 1.845 1.23 1.08 1.815 2.805 1.305 3.495.99.105-.78.42-1.305.765-1.605-2.67-.3-5.46-1.335-5.46-5.925 0-1.305.465-2.385 1.23-3.225-.12-.3-.54-1.53.12-3.18 0 0 1.005-.315 3.3 1.23.96-.27 1.98-.405 3-.405s2.04.135 3 .405c2.295-1.56 3.3-1.23 3.3-1.23.66 1.65.24 2.88.12 3.18.765.84 1.23 1.905 1.23 3.225 0 4.605-2.805 5.625-5.475 5.925.435.375.81 1.095.81 2.22 0 1.605-.015 2.895-.015 3.3 0 .315.225.69.825.57A12.02 12.02 0 0024 12c0-6.63-5.37-12-12-12z"/>
                 </svg>
-                <input type="text" id="urlInput" placeholder="https://example.com" autocomplete="off"
-                    spellcheck="false">
-                <button type="button" id="clearBtn" class="clear-btn" title="Clear input" aria-label="Clear">✕</button>
-            </div>
-
-            <!-- Customization controls toggle -->
-            <button type="button" class="accordion-toggle" id="toggleOptions">
-                <span>Customize Colors & Size</span>
-                <span class="chevron">▼</span>
-            </button>
-
-            <div class="options-panel hidden" id="optionsPanel">
-                <div class="option-row">
-                    <label for="fgColor">Foreground:</label>
-                    <input type="color" id="fgColor" value="#000000">
-                </div>
-                <div class="option-row">
-                    <label for="bgColor">Background:</label>
-                    <input type="color" id="bgColor" value="#ffffff">
-                </div>
-                <div class="option-row">
-                    <label for="qrSize">Size:</label>
-                    <select id="qrSize">
-                        <option value="180">Small (180px)</option>
-                        <option value="240" selected>Medium (240px)</option>
-                        <option value="320">Large (320px)</option>
-                        <option value="480">High-Res (480px)</option>
-                    </select>
-                </div>
-            </div>
-
-            <button type="button" class="btn-primary" id="generateBtn" onclick="generateQR()">Generate QR Code</button>
+            </a>
         </div>
+    </header>
 
-        <!-- Result section -->
-        <section id="qr-result" class="hidden result-card" aria-live="polite">
-            <div class="qr-canvas-box" id="qrContainer">
-                <img id="qrImage" alt="Generated QR Code" />
+    <!-- Main Studio Layout -->
+    <main class="studio-container">
+        <!-- Left Column: Editing Panel -->
+        <section class="studio-controls" aria-label="Editor controls">
+            <!-- Tabs Bar -->
+            <nav class="tabs-bar" role="tablist">
+                <button type="button" class="tab-btn active" data-tab="tab-content" role="tab">Content</button>
+                <button type="button" class="tab-btn" data-tab="tab-design" role="tab">Design</button>
+                <button type="button" class="tab-btn" data-tab="tab-colors" role="tab">Colors</button>
+                <button type="button" class="tab-btn" data-tab="tab-logo" role="tab">Logo</button>
+                <button type="button" class="tab-btn" data-tab="tab-precision" role="tab">Settings</button>
+            </nav>
+
+            <div class="tab-panels">
+                <!-- 1. Content Tab -->
+                <div class="tab-panel active" id="tab-content" role="tabpanel">
+                    <div class="field-group">
+                        <label class="field-label">Quick Presets</label>
+                        <div class="preset-chips">
+                            <button type="button" class="chip active" data-type="url" data-placeholder="https://example.com">Link</button>
+                            <button type="button" class="chip" data-type="text" data-placeholder="Enter message or note...">Text</button>
+                            <button type="button" class="chip" data-type="wifi" data-placeholder="WIFI:S:MyNetwork;T:WPA;P:Password;;">Wi-Fi</button>
+                            <button type="button" class="chip" data-type="email" data-placeholder="mailto:hello@example.com">Email</button>
+                        </div>
+                    </div>
+
+                    <div class="field-group">
+                        <label for="urlInput" class="field-label">Target URL or Data</label>
+                        <div class="input-container">
+                            <textarea id="urlInput" rows="3" placeholder="https://example.com" spellcheck="false" autocomplete="off">https://qr.shibili.xyz</textarea>
+                            <button type="button" id="clearBtn" class="clear-btn" title="Clear text">✕</button>
+                        </div>
+                        <span class="field-hint">Press Enter or edit text to see live changes.</span>
+                    </div>
+                </div>
+
+                <!-- 2. Design Tab: 3 QR Designs & Eyes -->
+                <div class="tab-panel" id="tab-design" role="tabpanel">
+                    <div class="field-group">
+                        <label class="field-label">Module Pattern Style</label>
+                        <div class="design-selector">
+                            <label class="design-card active">
+                                <input type="radio" name="qrDesign" value="squares" checked>
+                                <div class="card-content">
+                                    <svg viewBox="0 0 24 24" width="22" height="22" fill="currentColor">
+                                        <rect x="2" y="2" width="8" height="8" />
+                                        <rect x="14" y="2" width="8" height="8" />
+                                        <rect x="2" y="14" width="8" height="8" />
+                                        <rect x="14" y="14" width="8" height="8" />
+                                    </svg>
+                                    <span>Squares</span>
+                                </div>
+                            </label>
+                            <label class="design-card">
+                                <input type="radio" name="qrDesign" value="dots">
+                                <div class="card-content">
+                                    <svg viewBox="0 0 24 24" width="22" height="22" fill="currentColor">
+                                        <circle cx="6" cy="6" r="4" />
+                                        <circle cx="18" cy="6" r="4" />
+                                        <circle cx="6" cy="18" r="4" />
+                                        <circle cx="18" cy="18" r="4" />
+                                    </svg>
+                                    <span>Dots</span>
+                                </div>
+                            </label>
+                            <label class="design-card">
+                                <input type="radio" name="qrDesign" value="rounded">
+                                <div class="card-content">
+                                    <svg viewBox="0 0 24 24" width="22" height="22" fill="currentColor">
+                                        <rect x="2" y="2" width="8" height="8" rx="3" />
+                                        <rect x="14" y="2" width="8" height="8" rx="3" />
+                                        <rect x="2" y="14" width="8" height="8" rx="3" />
+                                        <rect x="14" y="14" width="8" height="8" rx="3" />
+                                    </svg>
+                                    <span>Rounded</span>
+                                </div>
+                            </label>
+                        </div>
+                    </div>
+
+                    <div class="field-group">
+                        <label class="field-label">Corner Finder Eye Style</label>
+                        <div class="design-selector">
+                            <label class="design-card active">
+                                <input type="radio" name="eyeStyle" value="square" checked>
+                                <div class="card-content">
+                                    <span class="eye-preview square"></span>
+                                    <span>Square</span>
+                                </div>
+                            </label>
+                            <label class="design-card">
+                                <input type="radio" name="eyeStyle" value="rounded">
+                                <div class="card-content">
+                                    <span class="eye-preview rounded"></span>
+                                    <span>Smooth</span>
+                                </div>
+                            </label>
+                            <label class="design-card">
+                                <input type="radio" name="eyeStyle" value="circle">
+                                <div class="card-content">
+                                    <span class="eye-preview circle"></span>
+                                    <span>Circle</span>
+                                </div>
+                            </label>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- 3. Colors Tab: Solid & Linear Gradients -->
+                <div class="tab-panel" id="tab-colors" role="tabpanel">
+                    <div class="field-group">
+                        <label class="field-label">Color Mode</label>
+                        <div class="toggle-group">
+                            <button type="button" class="toggle-btn active" id="solidColorBtn">Solid</button>
+                            <button type="button" class="toggle-btn" id="gradientColorBtn">Gradient</button>
+                        </div>
+                    </div>
+
+                    <!-- Solid Color Picker -->
+                    <div class="field-group" id="solidColorControls">
+                        <label class="field-label">Foreground Color</label>
+                        <div class="color-picker-item">
+                            <input type="color" id="fgColorInput" value="#000000">
+                            <span class="color-hex" id="fgColorHex">#000000</span>
+                        </div>
+                    </div>
+
+                    <!-- Gradient Color Pickers -->
+                    <div class="gradient-controls hidden" id="gradientControls">
+                        <div class="dual-colors">
+                            <div class="color-picker-item">
+                                <label>Start Color</label>
+                                <div class="color-input-wrapper">
+                                    <input type="color" id="gradColor1" value="#000000">
+                                    <span class="color-hex" id="gradHex1">#000000</span>
+                                </div>
+                            </div>
+                            <div class="color-picker-item">
+                                <label>End Color</label>
+                                <div class="color-input-wrapper">
+                                    <input type="color" id="gradColor2" value="#333333">
+                                    <span class="color-hex" id="gradHex2">#333333</span>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="slider-row">
+                            <label for="gradientAngle">Gradient Angle: <strong id="angleVal">45°</strong></label>
+                            <input type="range" id="gradientAngle" min="0" max="360" value="45" step="5">
+                        </div>
+                    </div>
+
+                    <!-- Eye Colors (Optional Customization) -->
+                    <div class="field-group">
+                        <div class="accordion-header" id="toggleEyeColors">
+                            <span>Custom Eye Colors</span>
+                            <span class="chevron">▼</span>
+                        </div>
+                        <div class="accordion-body hidden" id="eyeColorBody">
+                            <div class="dual-colors">
+                                <div class="color-picker-item">
+                                    <label>Outer Eye Frame</label>
+                                    <div class="color-input-wrapper">
+                                        <input type="color" id="eyeOuterColor" value="#000000">
+                                        <span class="color-hex" id="eyeOuterHex">Auto</span>
+                                    </div>
+                                </div>
+                                <div class="color-picker-item">
+                                    <label>Inner Pupil</label>
+                                    <div class="color-input-wrapper">
+                                        <input type="color" id="eyeInnerColor" value="#000000">
+                                        <span class="color-hex" id="eyeInnerHex">Auto</span>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Background Color -->
+                    <div class="field-group">
+                        <label class="field-label">Background</label>
+                        <div class="bg-selector">
+                            <div class="color-picker-item">
+                                <input type="color" id="bgColorInput" value="#ffffff">
+                                <span class="color-hex" id="bgColorHex">#ffffff</span>
+                            </div>
+                            <label class="checkbox-label">
+                                <input type="checkbox" id="transparentBg">
+                                <span>Transparent Background</span>
+                            </label>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- 4. Logo Tab -->
+                <div class="tab-panel" id="tab-logo" role="tabpanel">
+                    <div class="field-group">
+                        <label class="field-label">Upload Custom Logo</label>
+                        <div class="upload-dropzone" id="logoDropzone">
+                            <input type="file" id="logoFileInput" accept="image/png, image/jpeg, image/svg+xml, image/webp" class="file-hidden">
+                            <svg viewBox="0 0 24 24" width="32" height="32" fill="none" stroke="currentColor" stroke-width="1.8">
+                                <rect x="3" y="3" width="18" height="18" rx="4"/>
+                                <circle cx="8.5" cy="8.5" r="1.5"/>
+                                <polyline points="21 15 16 10 5 21"/>
+                            </svg>
+                            <p class="dropzone-text">Drag & drop logo here, or <span class="browse-link">browse</span></p>
+                            <span class="dropzone-sub">Supports PNG, SVG, JPG, WebP</span>
+                        </div>
+
+                        <!-- Active Logo Preview Card -->
+                        <div class="active-logo-card hidden" id="activeLogoCard">
+                            <img id="logoThumb" src="" alt="Logo Thumbnail">
+                            <div class="logo-info">
+                                <span class="logo-name" id="logoFileName">logo.png</span>
+                                <span class="badge-safe">Auto Error Correction (H - 30%)</span>
+                            </div>
+                            <button type="button" id="removeLogoBtn" class="btn-remove" title="Remove logo">✕</button>
+                        </div>
+                    </div>
+
+                    <div class="field-group" id="logoOptionsArea">
+                        <div class="slider-row">
+                            <label for="logoSizeRatio">Logo Scale: <strong id="logoSizeVal">20%</strong></label>
+                            <input type="range" id="logoSizeRatio" min="12" max="25" value="20" step="1">
+                        </div>
+
+                        <label class="field-label" style="margin-top: 12px;">Logo Badge Background</label>
+                        <div class="design-selector">
+                            <label class="design-card active">
+                                <input type="radio" name="logoShape" value="circle" checked>
+                                <div class="card-content">
+                                    <span class="shape-icon circle"></span>
+                                    <span>Circle</span>
+                                </div>
+                            </label>
+                            <label class="design-card">
+                                <input type="radio" name="logoShape" value="square">
+                                <div class="card-content">
+                                    <span class="shape-icon square"></span>
+                                    <span>Square</span>
+                                </div>
+                            </label>
+                            <label class="design-card">
+                                <input type="radio" name="logoShape" value="none">
+                                <div class="card-content">
+                                    <span class="shape-icon none"></span>
+                                    <span>None</span>
+                                </div>
+                            </label>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- 5. Precision & Settings Tab -->
+                <div class="tab-panel" id="tab-precision" role="tabpanel">
+                    <div class="field-group">
+                        <label class="field-label">Error Correction Level</label>
+                        <div class="correction-selector">
+                            <label class="correction-card">
+                                <input type="radio" name="correctionLevel" value="L">
+                                <div class="card-content">
+                                    <strong>Low (7%)</strong>
+                                    <span>Highest density</span>
+                                </div>
+                            </label>
+                            <label class="correction-card">
+                                <input type="radio" name="correctionLevel" value="M">
+                                <div class="card-content">
+                                    <strong>Medium (15%)</strong>
+                                    <span>Standard default</span>
+                                </div>
+                            </label>
+                            <label class="correction-card">
+                                <input type="radio" name="correctionLevel" value="Q">
+                                <div class="card-content">
+                                    <strong>Quartile (25%)</strong>
+                                    <span>Higher tolerance</span>
+                                </div>
+                            </label>
+                            <label class="correction-card active">
+                                <input type="radio" name="correctionLevel" value="H" checked>
+                                <div class="card-content">
+                                    <strong>High (30%)</strong>
+                                    <span>Best for logos & prints</span>
+                                </div>
+                            </label>
+                        </div>
+                    </div>
+
+                    <div class="field-group">
+                        <label for="exportSize" class="field-label">Export Resolution</label>
+                        <select id="exportSize" class="select-field">
+                            <option value="360">Standard Web (360 x 360 px)</option>
+                            <option value="500" selected>Crisp HD (500 x 500 px)</option>
+                            <option value="1000">Ultra High-Res (1000 x 1000 px)</option>
+                            <option value="2000">Vector Print Ready (2000 x 2000 px)</option>
+                        </select>
+                    </div>
+
+                    <div class="field-group">
+                        <label for="quietZone" class="field-label">Quiet Zone Margin</label>
+                        <div class="slider-row">
+                            <label for="quietZone">Margin: <strong id="quietZoneVal">3 modules</strong></label>
+                            <input type="range" id="quietZone" min="1" max="6" value="3" step="1">
+                        </div>
+                    </div>
+                </div>
             </div>
-
-            <div class="action-buttons">
-                <a id="downloadLink" href="#" download="qrcode.png" class="btn-download">
-                    <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2">
-                        <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path>
-                        <polyline points="7 10 12 15 17 10"></polyline>
-                        <line x1="12" y1="15" x2="12" y2="3"></line>
-                    </svg>
-                    Download PNG
-                </a>
-                <button type="button" id="copyBtn" class="btn-secondary" title="Copy to clipboard">
-                    <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2">
-                        <rect x="9" y="9" width="13" height="13" rx="2" ry="2"></rect>
-                        <path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"></path>
-                    </svg>
-                    Copy Image
-                </button>
-            </div>
-
         </section>
 
-        <div id="toast" class="toast hidden"></div>
+        <!-- Right Column: Sticky Live Preview Panel -->
+        <section class="studio-preview" aria-label="Live preview and export">
+            <div class="preview-card">
+                <div class="preview-header">
+                    <span class="preview-title">Live Preview</span>
+                    <span class="preview-format-tag" id="previewModeTag">VECTOR SVG</span>
+                </div>
+
+                <!-- Live Render Container -->
+                <div class="qr-stage" id="qrStage">
+                    <div id="svgContainer" class="svg-stage-box"></div>
+                    <canvas id="exportCanvas" class="hidden"></canvas>
+                </div>
+
+                <!-- Primary Clipboard Actions (Figma & Image) -->
+                <div class="primary-actions">
+                    <button type="button" class="btn-figma" id="copyFigmaBtn" title="Copy clean SVG for Figma vector frame import">
+                        <svg viewBox="0 0 38 57" width="18" height="26" fill="currentColor">
+                            <path d="M19 28.5a9.5 9.5 0 1 1 19 0 9.5 9.5 0 0 1-19 0z"/>
+                            <path d="M0 47.5A9.5 9.5 0 0 1 9.5 38H19v9.5a9.5 9.5 0 1 1-19 0z"/>
+                            <path d="M19 0v19h9.5a9.5 9.5 0 1 0 0-19H19z"/>
+                            <path d="M0 9.5A9.5 9.5 0 0 0 9.5 19H19V0H9.5A9.5 9.5 0 0 0 0 9.5z"/>
+                            <path d="M0 28.5A9.5 9.5 0 0 0 9.5 38H19V19H9.5A9.5 9.5 0 0 0 0 28.5z"/>
+                        </svg>
+                        <span>Copy for Figma (Vector Frame)</span>
+                    </button>
+                    <button type="button" class="btn-copy-png" id="copyPngBtn" title="Copy PNG to clipboard">
+                        <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2">
+                            <rect x="9" y="9" width="13" height="13" rx="2" ry="2"/>
+                            <path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/>
+                        </svg>
+                        <span>Copy PNG</span>
+                    </button>
+                </div>
+
+                <!-- Download Buttons Grid -->
+                <div class="download-grid">
+                    <button type="button" class="dl-btn" id="dlPngBtn">
+                        <span class="dl-ext">PNG</span>
+                        <span class="dl-desc">High-Res Raster</span>
+                    </button>
+                    <button type="button" class="dl-btn highlight" id="dlSvgBtn">
+                        <span class="dl-ext">SVG</span>
+                        <span class="dl-desc">Scalable Vector</span>
+                    </button>
+                    <button type="button" class="dl-btn" id="dlJpgBtn">
+                        <span class="dl-ext">JPG</span>
+                        <span class="dl-desc">Solid Image</span>
+                    </button>
+                    <button type="button" class="dl-btn" id="dlPdfBtn">
+                        <span class="dl-ext">PDF</span>
+                        <span class="dl-desc">Print Vector</span>
+                    </button>
+                </div>
+
+                <div class="compatibility-notice">
+                    <span>Compatible with Figma, Canva, Adobe Illustrator, and Photoshop.</span>
+                </div>
+            </div>
+        </section>
     </main>
 
+    <!-- Toast Notification -->
+    <div id="toast" class="toast hidden"></div>
+
+    <!-- Hidden download link for triggering file saves -->
+    <a id="downloadAnchor" class="hidden"></a>
+
     <script src="qrcode.min.js"></script>
+    <script src="qr-engine.js"></script>
     <script src="script.js"></script>
 </body>
-
 </html>
