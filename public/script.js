@@ -2,7 +2,7 @@
     'use strict';
 
     const state = {
-        text: 'https://qr.shibili.xyz',
+        text: '',
         design: 'squares',
         eyeStyle: 'square',
         colorMode: 'solid',
@@ -627,8 +627,8 @@
             matchQrBgCheck.addEventListener('change', () => {
                 if (state.logo) {
                     state.logo.matchBg = matchQrBgCheck.checked;
-                    state.logo.bgColor = matchQrBgCheck.checked 
-                        ? (state.transparentBg ? '#ffffff' : state.bgColor) 
+                    state.logo.bgColor = matchQrBgCheck.checked
+                        ? (state.transparentBg ? '#ffffff' : state.bgColor)
                         : (logoBgInput ? logoBgInput.value : '#ffffff');
                     scheduleRender();
                 }
