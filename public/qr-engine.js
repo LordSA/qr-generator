@@ -1,9 +1,3 @@
-/**
- * QR Studio Engine
- * High-performance vector & canvas QR code renderer with custom shapes,
- * finder eye styling, gradient mapping, logo embedding, and Figma vector export.
- */
-
 (function (global) {
     'use strict';
 
@@ -14,9 +8,6 @@
             document.body.appendChild(this.tempEl);
         }
 
-        /**
-         * Computes the raw QR module matrix using the bundled QRCode library
-         */
         getMatrix(text, correctionLevel = 'M') {
             const levelMap = {
                 'L': (typeof QRCode !== 'undefined' ? QRCode.CorrectLevel.L : 1),
@@ -48,28 +39,18 @@
             return { matrix, moduleCount };
         }
 
-        /**
-         * Checks if a coordinate is within any of the 3 corner finder eye patterns (7x7)
-         */
         isFinderEye(r, c, count) {
-            // Top-Left
             if (r < 7 && c < 7) return 'TL';
-            // Top-Right
             if (r < 7 && c >= count - 7) return 'TR';
-            // Bottom-Left
             if (r >= count - 7 && c < 7) return 'BL';
             return null;
         }
 
-        /**
-         * Calculates the safe cutout area for central logos
-         */
         getLogoSafeBounds(moduleCount, logoRatio = 0.2, margin = 1) {
             const logoModules = Math.ceil(moduleCount * logoRatio);
             let start = Math.floor((moduleCount - logoModules) / 2) - margin;
             let end = Math.floor((moduleCount - logoModules) / 2) + logoModules + margin;
 
-            // Strict protection of finder eyes and timing tracks (0..7 and count-7..count)
             start = Math.max(start, 7);
             end = Math.min(end, moduleCount - 7);
 
@@ -81,27 +62,24 @@
             };
         }
 
-        /**
-         * Generates clean, scalable SVG vector XML
-         */
         generateSVG(options = {}) {
             const {
                 text = 'https://example.com',
                 correctionLevel = 'H',
                 size = 500,
                 quietZone = 3,
-                design = 'squares', // 'squares' | 'dots' | 'rounded'
-                colorType = 'solid', // 'solid' | 'gradient'
+                design = 'squares',
+                colorType = 'solid',
                 fgColor = '#000000',
                 gradientColor1 = '#000000',
                 gradientColor2 = '#333333',
                 gradientAngle = 45,
                 bgColor = '#ffffff',
                 transparentBg = false,
-                eyeStyle = 'square', // 'square' | 'rounded' | 'circle'
+                eyeStyle = 'square',
                 eyeOuterColor = '',
                 eyeInnerColor = '',
-                logo = null // { dataUrl, sizeRatio: 0.2, shape: 'circle' | 'square' | 'none', padding: 1, bgColor, hasBorder, borderColor }
+                logo = null
             } = options;
 
             const { matrix, moduleCount } = this.getMatrix(text, correctionLevel);
@@ -128,12 +106,10 @@
                 fillAttr = 'url(#qr-gradient)';
             }
 
-            // Background
             const bgRect = transparentBg 
                 ? '' 
                 : `<rect id="Background" width="${size}" height="${size}" fill="${bgColor}" rx="12" ry="12" />`;
 
-            // Logo safe zone
             const hasLogo = logo && logo.dataUrl;
             let logoBounds = null;
             if (hasLogo) {
@@ -142,13 +118,11 @@
                 logoBounds = this.getLogoSafeBounds(moduleCount, ratio, paddingModules);
             }
 
-            // Draw Data Modules
             let modulesSVG = '';
             for (let r = 0; r < moduleCount; r++) {
                 for (let c = 0; c < moduleCount; c++) {
                     if (this.isFinderEye(r, c, moduleCount)) continue;
 
-                    // Skip modules inside logo cutout
                     if (hasLogo) {
                         const shape = logo.shape || 'circle';
                         if (shape === 'circle') {
@@ -174,19 +148,16 @@
                             const rx = (moduleSize * 0.35).toFixed(2);
                             modulesSVG += `<rect x="${x.toFixed(2)}" y="${y.toFixed(2)}" width="${moduleSize.toFixed(2)}" height="${moduleSize.toFixed(2)}" rx="${rx}" ry="${rx}" fill="${fillAttr}" />`;
                         } else {
-                            // Classic squares
                             modulesSVG += `<rect x="${x.toFixed(2)}" y="${y.toFixed(2)}" width="${(moduleSize + 0.1).toFixed(2)}" height="${(moduleSize + 0.1).toFixed(2)}" fill="${fillAttr}" />`;
                         }
                     }
                 }
             }
 
-            // Draw Finder Eyes
             const outerColor = eyeOuterColor || fillAttr;
             const innerColor = eyeInnerColor || outerColor;
             let eyesSVG = this.renderSVGEyes(moduleCount, quietZone, moduleSize, eyeStyle, outerColor, innerColor, transparentBg ? '#ffffff' : bgColor);
 
-            // Draw Logo Element
             let logoSVG = '';
             if (hasLogo) {
                 const logoScale = Math.min(Math.max(logo.sizeRatio || 0.2, 0.12), 0.25);
@@ -222,7 +193,6 @@
     </g>`;
             }
 
-            // Final SVG composition with structured Figma-ready layers
             return `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 ${size} ${size}" width="${size}" height="${size}" shape-rendering="geometricPrecision">
   ${defs}
   <g id="QR-Studio-Frame">
@@ -238,9 +208,6 @@
 </svg>`;
         }
 
-        /**
-         * Renders the 3 corner finder eyes in SVG
-         */
         renderSVGEyes(moduleCount, quietZone, moduleSize, eyeStyle, outerColor, innerColor, cutColor) {
             const eyePositions = [
                 { r: 0, c: 0 },
@@ -282,7 +249,6 @@
           <rect x="${cutX}" y="${cutY}" width="${cutSize}" height="${cutSize}" rx="${cutRx}" ry="${cutRx}" fill="${cutColor}" />
           <rect x="${pupilX}" y="${pupilY}" width="${pupilSize}" height="${pupilSize}" rx="${pupilRx}" ry="${pupilRx}" fill="${innerColor}" />`;
                 } else {
-                    // Classic square eyes
                     const cutX = (ox + moduleSize).toFixed(2);
                     const cutY = (oy + moduleSize).toFixed(2);
                     const cutSize = (5 * moduleSize).toFixed(2);
@@ -300,9 +266,6 @@
             return eyesSVG;
         }
 
-        /**
-         * Renders the QR code directly to an HTML5 Canvas element
-         */
         renderToCanvas(canvas, options = {}) {
             const svgString = this.generateSVG(options);
             const blob = new Blob([svgString], { type: 'image/svg+xml;charset=utf-8' });
@@ -318,7 +281,6 @@
                     ctx.drawImage(img, 0, 0);
                     URL.revokeObjectURL(url);
 
-                    // If logo is attached, ensure badge and logo render reliably to canvas
                     if (options.logo && options.logo.dataUrl) {
                         const logoImg = new Image();
                         logoImg.onload = () => {
@@ -384,14 +346,10 @@
             });
         }
 
-        /**
-         * Export to PDF Blob without external dependencies
-         */
         generatePDFBlob(canvas, title = "QR Code") {
             const imgData = canvas.toDataURL('image/jpeg', 0.95);
-            // Standard A4 PDF minimal binary structure
-            const width = 595.28; // A4 width in pt
-            const height = 841.89; // A4 height in pt
+            const width = 595.28;
+            const height = 841.89;
             const qrSize = 340;
             const x = (width - qrSize) / 2;
             const y = (height - qrSize) / 2 - 30;

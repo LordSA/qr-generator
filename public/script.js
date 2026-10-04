@@ -1,17 +1,11 @@
-/**
- * QR Studio - Interactive Dashboard Controller
- * Handles state, reactive updates, logo uploads, vector exports, and clipboard integration.
- */
-
 (function () {
     'use strict';
 
-    // Application State
     const state = {
         text: 'https://qr.shibili.xyz',
-        design: 'squares', // 'squares' | 'dots' | 'rounded'
-        eyeStyle: 'square', // 'square' | 'rounded' | 'circle'
-        colorMode: 'solid', // 'solid' | 'gradient'
+        design: 'squares',
+        eyeStyle: 'square',
+        colorMode: 'solid',
         fgColor: '#000000',
         gradColor1: '#000000',
         gradColor2: '#333333',
@@ -23,12 +17,11 @@
         correctionLevel: 'H',
         exportSize: 500,
         quietZone: 3,
-        logo: null // { dataUrl, fileName, sizeRatio, shape, bgPadding }
+        logo: null
     };
 
     let renderTimeout = null;
 
-    // Toast Notification System
     function showToast(message, type = 'info') {
         const toast = document.getElementById('toast');
         if (!toast) return;
@@ -40,7 +33,6 @@
         }, 3200);
     }
 
-    // Debounced Reactive QR Renderer
     function scheduleRender(delay = 30) {
         clearTimeout(renderTimeout);
         renderTimeout = setTimeout(renderQR, delay);
@@ -76,11 +68,8 @@
         };
 
         try {
-            // 1. Generate SVG and mount into live preview stage
             const svgString = QREngine.generateSVG(options);
             svgContainer.innerHTML = svgString;
-
-            // 2. Render to hidden export canvas for raster / clipboard exports
             await QREngine.renderToCanvas(exportCanvas, options);
         } catch (err) {
             console.warn('QR Render warning:', err);
@@ -88,14 +77,12 @@
         }
     }
 
-    // Expose global for backward compatibility
     window.generateQR = function () {
         const input = document.getElementById('urlInput');
         if (input) state.text = input.value.trim();
         renderQR();
     };
 
-    // Copy clean Vector SVG for Figma / Canva
     async function copyVectorForFigma() {
         if (!state.text) {
             showToast('Enter some text or a URL first.', 'warning');
@@ -124,7 +111,6 @@
 
             const svgString = QREngine.generateSVG(options);
 
-            // Create both text/plain and image/svg+xml clipboard items
             if (navigator.clipboard && navigator.clipboard.write) {
                 const textBlob = new Blob([svgString], { type: 'text/plain' });
                 const svgBlob = new Blob([svgString], { type: 'image/svg+xml' });
@@ -139,7 +125,6 @@
                     showToast('✓ Vector Frame copied! Ready to paste into Figma / Canva.', 'success');
                     return;
                 } catch {
-                    // Fallback to text/plain only
                     await navigator.clipboard.writeText(svgString);
                     showToast('✓ Vector SVG copied! Paste directly into Figma canvas.', 'success');
                     return;
@@ -154,7 +139,6 @@
         }
     }
 
-    // Copy PNG Image to clipboard
     async function copyPNGImage() {
         const canvas = document.getElementById('exportCanvas');
         if (!canvas) return;
@@ -180,29 +164,62 @@
         }
     }
 
-    // File Download Handler
-    function triggerDownload(dataUrlOrBlob, filename) {
-        const anchor = document.getElementById('downloadAnchor');
-        if (!anchor) return;
+    function triggerDownload(blobOrUrl, filename) {
+        let url;
+        let needsRevoke = false;
 
-        const isBlob = dataUrlOrBlob instanceof Blob;
-        const url = isBlob ? URL.createObjectURL(dataUrlOrBlob) : dataUrlOrBlob;
-
-        anchor.href = url;
-        anchor.download = filename;
-        anchor.click();
-
-        if (isBlob) {
-            setTimeout(() => URL.revokeObjectURL(url), 1000);
+        if (blobOrUrl instanceof Blob) {
+            url = URL.createObjectURL(blobOrUrl);
+            needsRevoke = true;
+        } else if (typeof blobOrUrl === 'string') {
+            if (blobOrUrl.startsWith('data:')) {
+                const parts = blobOrUrl.split(',');
+                const mimeMatch = parts[0].match(/:(.*?);/);
+                const mime = mimeMatch ? mimeMatch[1] : 'application/octet-stream';
+                const bstr = atob(parts[1]);
+                let n = bstr.length;
+                const u8arr = new Uint8Array(n);
+                while (n--) {
+                    u8arr[n] = bstr.charCodeAt(n);
+                }
+                const blob = new Blob([u8arr], { type: mime });
+                url = URL.createObjectURL(blob);
+                needsRevoke = true;
+            } else {
+                url = blobOrUrl;
+            }
+        } else {
+            return;
         }
+
+        const link = document.createElement('a');
+        link.style.position = 'fixed';
+        link.style.top = '-9999px';
+        link.style.left = '-9999px';
+        link.style.opacity = '0';
+        link.setAttribute('href', url);
+        link.setAttribute('download', filename);
+        document.body.appendChild(link);
+        link.click();
+
+        setTimeout(() => {
+            if (link.parentNode) link.parentNode.removeChild(link);
+            if (needsRevoke) URL.revokeObjectURL(url);
+        }, 1500);
+
         showToast(`✓ Downloaded ${filename}`, 'success');
     }
 
     function downloadPNG() {
         const canvas = document.getElementById('exportCanvas');
         if (!canvas) return;
-        const dataUrl = canvas.toDataURL('image/png');
-        triggerDownload(dataUrl, 'qr-code.png');
+        canvas.toBlob((blob) => {
+            if (!blob) {
+                showToast('Failed to export PNG', 'error');
+                return;
+            }
+            triggerDownload(blob, 'qr-code.png');
+        }, 'image/png');
     }
 
     function downloadSVG() {
@@ -211,7 +228,10 @@
         const svg = svgContainer.querySelector('svg');
         if (!svg) return;
         const serializer = new XMLSerializer();
-        const svgString = serializer.serializeToString(svg);
+        let svgString = serializer.serializeToString(svg);
+        if (!svgString.startsWith('<?xml')) {
+            svgString = '<?xml version="1.0" encoding="UTF-8"?>\n' + svgString;
+        }
         const blob = new Blob([svgString], { type: 'image/svg+xml;charset=utf-8' });
         triggerDownload(blob, 'qr-code.svg');
     }
@@ -219,15 +239,26 @@
     function downloadJPG() {
         const canvas = document.getElementById('exportCanvas');
         if (!canvas) return;
-        const dataUrl = canvas.toDataURL('image/jpeg', 0.95);
-        triggerDownload(dataUrl, 'qr-code.jpg');
+        const tempCanvas = document.createElement('canvas');
+        tempCanvas.width = canvas.width;
+        tempCanvas.height = canvas.height;
+        const ctx = tempCanvas.getContext('2d');
+        ctx.fillStyle = state.transparentBg ? '#ffffff' : (state.bgColor || '#ffffff');
+        ctx.fillRect(0, 0, tempCanvas.width, tempCanvas.height);
+        ctx.drawImage(canvas, 0, 0);
+        tempCanvas.toBlob((blob) => {
+            if (!blob) {
+                showToast('Failed to export JPG', 'error');
+                return;
+            }
+            triggerDownload(blob, 'qr-code.jpg');
+        }, 'image/jpeg', 0.95);
     }
 
     function downloadPDF() {
         const canvas = document.getElementById('exportCanvas');
         if (!canvas) return;
         const pdfBlob = QREngine.generatePDFBlob(canvas, state.text || "QR Code");
-        // Open printable view
         const url = URL.createObjectURL(pdfBlob);
         const printWindow = window.open(url, '_blank');
         if (printWindow) {
@@ -237,7 +268,6 @@
         }
     }
 
-    // Logo Handling & Protection
     function updateCorrectionUIForLogo(hasLogo) {
         const notice = document.getElementById('logoCorrectionNotice');
         const cardL = document.getElementById('cardL');
@@ -247,14 +277,12 @@
         const radioH = document.querySelector('input[name="correctionLevel"][value="H"]');
 
         if (hasLogo) {
-            // Lock to Level H (or Q)
             if (notice) notice.classList.remove('hidden');
             if (cardL) cardL.classList.add('disabled');
             if (cardM) cardM.classList.add('disabled');
             if (radioL) radioL.disabled = true;
             if (radioM) radioM.disabled = true;
 
-            // Ensure state is set to Level H
             state.correctionLevel = 'H';
             if (radioH) {
                 radioH.checked = true;
@@ -262,7 +290,6 @@
                 radioH.closest('.correction-card')?.classList.add('active');
             }
         } else {
-            // Restore all options
             if (notice) notice.classList.add('hidden');
             if (cardL) cardL.classList.remove('disabled');
             if (cardM) cardM.classList.remove('disabled');
@@ -299,10 +326,8 @@
                 borderColor: 'rgba(0, 0, 0, 0.15)'
             };
 
-            // Enforce Error Correction Level H (30%)
             updateCorrectionUIForLogo(true);
 
-            // Update UI card
             const activeCard = document.getElementById('activeLogoCard');
             const logoThumb = document.getElementById('logoThumb');
             const logoName = document.getElementById('logoFileName');
@@ -325,16 +350,13 @@
         if (activeCard) activeCard.classList.add('hidden');
         if (fileInput) fileInput.value = '';
 
-        // Re-enable low/medium correction
         updateCorrectionUIForLogo(false);
 
         showToast('Logo removed. All error correction levels restored.', 'info');
         scheduleRender();
     }
 
-    // DOM Initialization & Event Bindings
     document.addEventListener('DOMContentLoaded', () => {
-        // 1. Tab Navigation
         const tabBtns = document.querySelectorAll('.tab-btn');
         const tabPanels = document.querySelectorAll('.tab-panel');
 
@@ -350,7 +372,6 @@
             });
         });
 
-        // 2. Preset Chips
         const chips = document.querySelectorAll('.preset-chips .chip');
         const urlInput = document.getElementById('urlInput');
 
@@ -370,7 +391,6 @@
             });
         });
 
-        // 3. Text Input & Clear Button
         const clearBtn = document.getElementById('clearBtn');
         if (urlInput) {
             urlInput.addEventListener('input', () => {
@@ -387,7 +407,6 @@
             });
         }
 
-        // 4. Design Style Selector (Squares, Dots, Rounded)
         document.querySelectorAll('input[name="qrDesign"]').forEach(radio => {
             radio.addEventListener('change', (e) => {
                 document.querySelectorAll('input[name="qrDesign"]').forEach(r => {
@@ -399,7 +418,6 @@
             });
         });
 
-        // 5. Eye Style Selector
         document.querySelectorAll('input[name="eyeStyle"]').forEach(radio => {
             radio.addEventListener('change', (e) => {
                 document.querySelectorAll('input[name="eyeStyle"]').forEach(r => {
@@ -411,7 +429,6 @@
             });
         });
 
-        // 6. Color Controls & Modes
         const solidBtn = document.getElementById('solidColorBtn');
         const gradBtn = document.getElementById('gradientColorBtn');
         const solidControls = document.getElementById('solidColorControls');
@@ -477,7 +494,6 @@
             });
         }
 
-        // Accordion for Eye Colors
         const toggleEyeBtn = document.getElementById('toggleEyeColors');
         const eyeColorBody = document.getElementById('eyeColorBody');
         if (toggleEyeBtn && eyeColorBody) {
@@ -508,7 +524,6 @@
             });
         }
 
-        // Background Color & Transparency
         const bgInput = document.getElementById('bgColorInput');
         const bgHex = document.getElementById('bgColorHex');
         const transparentCheckbox = document.getElementById('transparentBg');
@@ -528,7 +543,6 @@
             });
         }
 
-        // 7. Logo Upload & Drag-and-drop
         const dropzone = document.getElementById('logoDropzone');
         const fileInput = document.getElementById('logoFileInput');
         const removeLogoBtn = document.getElementById('removeLogoBtn');
@@ -590,7 +604,6 @@
             });
         });
 
-        // Logo Badge Background & Border Listeners
         const logoBgInput = document.getElementById('logoBgColorInput');
         const logoBgHex = document.getElementById('logoBgColorHex');
         const matchQrBgCheck = document.getElementById('matchQrBg');
@@ -642,7 +655,6 @@
             });
         }
 
-        // 8. Error Correction Level with Logo Safeguard
         document.querySelectorAll('input[name="correctionLevel"]').forEach(radio => {
             radio.addEventListener('change', (e) => {
                 if (state.logo && (e.target.value === 'L' || e.target.value === 'M')) {
@@ -666,7 +678,6 @@
             });
         });
 
-        // 9. Resolution & Margin
         const exportSelect = document.getElementById('exportSize');
         if (exportSelect) {
             exportSelect.addEventListener('change', () => {
@@ -685,7 +696,6 @@
             });
         }
 
-        // 10. Primary Action Buttons
         const copyFigmaBtn = document.getElementById('copyFigmaBtn');
         if (copyFigmaBtn) {
             copyFigmaBtn.addEventListener('click', copyVectorForFigma);
@@ -696,7 +706,6 @@
             copyPngBtn.addEventListener('click', copyPNGImage);
         }
 
-        // Download Action Buttons
         const dlPngBtn = document.getElementById('dlPngBtn');
         if (dlPngBtn) dlPngBtn.addEventListener('click', downloadPNG);
 
@@ -709,7 +718,6 @@
         const dlPdfBtn = document.getElementById('dlPdfBtn');
         if (dlPdfBtn) dlPdfBtn.addEventListener('click', downloadPDF);
 
-        // Initial First Render
         renderQR();
     });
 
